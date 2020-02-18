@@ -1,0 +1,3 @@
+.idea
+*.py[cod]
+rework/settings/local.py
