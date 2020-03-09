@@ -2,3 +2,5 @@
 *.py[cod]
 rework/settings/local.py
 *.sqlite3
+static/
+media/
