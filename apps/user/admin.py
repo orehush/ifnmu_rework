@@ -1,7 +1,10 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 
-from apps.user.models import Student, Teacher, DeaneryOfficer
+from apps.user.models import User
 
-admin.site.register(Student)
-admin.site.register(Teacher)
-admin.site.register(DeaneryOfficer)
+
+@admin.register(User)
+class UserAdmin(BaseUserAdmin):
+    # TODO add type, group, department, faculty
+    pass

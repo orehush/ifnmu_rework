@@ -1,25 +1,33 @@
-from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 from apps.department.models import Department
 from apps.faculty.models import Faculty, AcademicGroup
+from apps.user.choices import UserType
 
 
-class Student(User):
-    class Meta:
-        verbose_name = 'Student'
+class User(AbstractUser):
+    type = models.PositiveSmallIntegerField(
+        choices=UserType.choices, null=True, blank=True)
 
-    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE)
-    group = models.ForeignKey(AcademicGroup, on_delete=models.CASCADE)
+    # student's fields
+    faculty = models.ForeignKey(
+        Faculty, on_delete=models.CASCADE, null=True, blank=True)
+    group = models.ForeignKey(
+        AcademicGroup, on_delete=models.CASCADE, null=True, blank=True)
 
+    # teacher's fields
+    department = models.ForeignKey(
+        Department, on_delete=models.CASCADE, null=True, blank=True)
 
-class DeaneryOfficer(User):
-    class Meta:
-        verbose_name = 'Officer'
+    def __str__(self):
+        return self.get_full_name() or self.get_username()
 
+    def is_student(self):
+        return self.type == UserType.STUDENT.value
 
-class Teacher(User):
-    class Meta:
-        verbose_name = 'Teacher'
+    def is_officer(self):
+        return self.type == UserType.OFFICER.value
 
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    def is_teacher(self):
+        return self.type == UserType.TEACHER.value

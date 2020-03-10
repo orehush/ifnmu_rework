@@ -58,7 +58,7 @@ def load_data(*args):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('subject', '0003_auto_20200303_0854'),
+        ('subject', '0002_auto_20200310_0954'),
     ]
 
     operations = [
