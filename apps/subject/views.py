@@ -1,13 +1,18 @@
 from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
-from django.views.generic import CreateView, ListView
+from django.views.generic import CreateView, ListView, TemplateView
 from django.utils.text import gettext_lazy as _
 
 from .forms import ReworkCreateForm
 from .models import Rework
 
 
-class ReworkCreateView(CreateView):
+class IndexView(LoginRequiredMixin, TemplateView):
+    template_name = 'base.html'
+
+
+class ReworkCreateView(LoginRequiredMixin, CreateView):
     form_class = ReworkCreateForm
     template_name = 'subject/rework/create.html'
 
@@ -27,11 +32,17 @@ class ReworkCreateView(CreateView):
         return super(ReworkCreateView, self).form_valid(form)
 
 
-class ReworkListView(ListView):
+class ReworkListView(LoginRequiredMixin, ListView):
     queryset = Rework.objects.all()
     template_name = 'subject/rework/list.html'
     context_object_name = 'reworks'
 
     def get_queryset(self):
-        # TODO filter by user type
-        return self.queryset
+        user = self.request.user
+        if user.is_student():
+            return self.queryset.filter(student=user)
+        if user.is_teacher():
+            return self.queryset.filter(subject__department=user.department)
+        if user.is_officer() or user.is_superuser:
+            return self.queryset
+        return self.queryset.none()
