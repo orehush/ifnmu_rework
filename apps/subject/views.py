@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.views.generic import CreateView, ListView, TemplateView
 from django.utils.text import gettext_lazy as _
@@ -15,6 +16,11 @@ class IndexView(LoginRequiredMixin, TemplateView):
 class ReworkCreateView(LoginRequiredMixin, CreateView):
     form_class = ReworkCreateForm
     template_name = 'subject/rework/create.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_student() and request.user.faculty and request.user.group:
+            return super(ReworkCreateView, self).dispatch(request, *args, **kwargs)
+        raise PermissionDenied
 
     def get_success_url(self):
         return reverse('rework-list')
