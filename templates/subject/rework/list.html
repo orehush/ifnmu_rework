@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% load bootstrap4 %}
+
+{% block head %}
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+    <script src="//cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            {% bootstrap_messages %}
+        </div>
+        <div class="row">
+            <table class="table" id="rework-list">
+                <thead class="thead-dark">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Student</th>
+                        <th scope="col">Faculty</th>
+                        <th scope="col">Department</th>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Approved by</th>
+                        <th scope="col">Accepted by</th>
+                        <th scope="col">Comment</th>
+                        <th scope="col">Document</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for rework in reworks %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ rework.student }}</td>
+                        <td>{{ rework.subject.faculty }}</td>
+                        <td>{{ rework.subject.department }}</td>
+                        <td>{{ rework.subject }}</td>
+                        <td>{{ rework.officer|default_if_none:'' }}</td>
+                        <td>{{ rework.teacher|default_if_none:'' }}</td>
+                        <td>{{ rework.comment }}</td>
+                        <td>
+                            <a href="#" class="pop-up">
+                                <img class="source" src="/media/{{ rework.document }}" style="width: 200px;">
+                                Click to enlarge
+                            </a>
+                        </td>
+                        <td>{{ rework.get_status_display }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+<!-- Creates the bootstrap modal where the image will appear -->
+<div class="modal fade" id="imagemodal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Image preview</h4>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+      </div>
+      <div class="modal-body">
+        <img src="" id="imagepreview" style="width: 100%;" >
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $(document).ready( function () {
+            $('#rework-list').DataTable();
+
+            $(".pop-up").on("click", function() {
+               $('#imagepreview').attr('src', $(this).find('.source').attr('src'));
+               $('#imagemodal').modal('show');
+            });
+        } );
+    </script>
+{% endblock %}
